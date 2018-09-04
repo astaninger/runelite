@@ -28,6 +28,8 @@ package net.runelite.client.plugins.chatcommands;
 import com.google.common.eventbus.Subscribe;
 import com.google.inject.Provides;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ScheduledExecutorService;
@@ -86,7 +88,7 @@ public class ChatCommandsPlugin extends Plugin implements ChatboxInputListener
 	private static final Pattern RAIDS_PATTERN = Pattern.compile("Your completed (.+) count is: <col=ff0000>(\\d+)</col>.");
 	private static final Pattern WINTERTODT_PATERN = Pattern.compile("Your subdued Wintertodt count is: <col=ff0000>(\\d+)</col>.");
 	private static final Pattern BARROWS_PATERN = Pattern.compile("Your Barrows chest count is: <col=ff0000>(\\d+)</col>.");
-	private static final String TOTAL_LEVEL_COMMAND_STRING = "!total";
+	private static final List<String> TotalLevelCommands = Arrays.asList("!total", "!overall");
 	private static final String PRICE_COMMAND_STRING = "!price";
 	private static final String LEVEL_COMMAND_STRING = "!lvl";
 	private static final String CLUES_COMMAND_STRING = "!clues";
@@ -190,7 +192,7 @@ public class ChatCommandsPlugin extends Plugin implements ChatboxInputListener
 		// being reused
 		messageNode.setRuneLiteFormatMessage(null);
 
-		if (config.lvl() && message.toLowerCase().equals(TOTAL_LEVEL_COMMAND_STRING))
+		if (config.lvl() && TotalLevelCommands.contains(message.toLowerCase()))
 		{
 			log.debug("Running total level lookup");
 			executor.submit(() -> playerSkillLookup(setMessage, "total"));
