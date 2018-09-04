@@ -88,8 +88,8 @@ public class ChatCommandsPlugin extends Plugin implements ChatboxInputListener
 	private static final Pattern RAIDS_PATTERN = Pattern.compile("Your completed (.+) count is: <col=ff0000>(\\d+)</col>.");
 	private static final Pattern WINTERTODT_PATERN = Pattern.compile("Your subdued Wintertodt count is: <col=ff0000>(\\d+)</col>.");
 	private static final Pattern BARROWS_PATERN = Pattern.compile("Your Barrows chest count is: <col=ff0000>(\\d+)</col>.");
-	private static final List<String> TotalLevelCommands = Arrays.asList("!total", "!overall");
-	private static final String PRICE_COMMAND_STRING = "!price";
+	private static final List<String> TotalLevelCommands = Arrays.asList("!total", "!overall", "!totallevel", "!t");
+	private static final String PRICE_COMMAND_STRING = "(!price |!ge |!value |!cost ).*";
 	private static final String LEVEL_COMMAND_STRING = "!lvl";
 	private static final String CLUES_COMMAND_STRING = "!clues";
 	private static final String KILLCOUNT_COMMAND_STRING = "!kc";
@@ -202,16 +202,16 @@ public class ChatCommandsPlugin extends Plugin implements ChatboxInputListener
 			log.debug("Running combat level lookup");
 			executor.submit(() -> combatLevelLookup(setMessage.getType(), setMessage));
 		}
-		else if (config.price() && message.toLowerCase().startsWith(PRICE_COMMAND_STRING + " "))
+		else if (config.price() && message.toLowerCase().matches(PRICE_COMMAND_STRING))
 		{
-			String search = message.substring(PRICE_COMMAND_STRING.length() + 1);
+			String search = message.substring(message.indexOf(' ') + 1);
 
 			log.debug("Running price lookup for {}", search);
 			executor.submit(() -> itemPriceLookup(setMessage.getMessageNode(), search));
 		}
 		else if (config.lvl() && message.toLowerCase().startsWith(LEVEL_COMMAND_STRING + " "))
 		{
-			String search = message.substring(LEVEL_COMMAND_STRING.length() + 1);
+			String search = message.substring(message.indexOf(' ') + 1);
 
 			log.debug("Running level lookup for {}", search);
 			executor.submit(() -> playerSkillLookup(setMessage, search));
@@ -460,26 +460,28 @@ public class ChatCommandsPlugin extends Plugin implements ChatboxInputListener
 	private void itemPriceLookup(MessageNode messageNode, String search)
 	{
 		SearchResult result;
-
+		log.debug("hey");
 		try
 		{
 			result = itemManager.searchForItem(search);
+			log.debug("hi");
 		}
 		catch (ExecutionException ex)
 		{
 			log.warn("Unable to search for item {}", search, ex);
 			return;
 		}
-
+		log.debug(result.getItems().toString());
 		if (result != null && !result.getItems().isEmpty())
 		{
+			log.debug("xD");
 			Item item = retrieveFromList(result.getItems(), search);
 			if (item == null)
 			{
 				log.debug("Unable to find item {} in result {}", search, result);
 				return;
 			}
-
+			log.debug("omg");
 			int itemId = item.getId();
 			int itemPrice = itemManager.getItemPrice(itemId);
 
